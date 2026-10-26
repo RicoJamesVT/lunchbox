@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lunchbox Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Nunito:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F8F4;--card:#fff;--ink:#17332C;--mute:#5F7A72;--line:#D8E6DE;--p:#E2557A;--g:#E8A91C;--f:#F2793F;--v:#2E8B5E;--t:#6B5BD6;--btn:#17332C;--btnink:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1D19;--card:#18292A;--ink:#EAF4EE;--mute:#9DB8AE;--line:#2A4039;--p:#FF7D9C;--g:#F5C04A;--f:#FF9B66;--v:#58C490;--t:#A99BFF;--btn:#EAF4EE;--btnink:#0F1D19;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1D19;--card:#18292A;--ink:#EAF4EE;--mute:#9DB8AE;--line:#2A4039;--p:#FF7D9C;--g:#F5C04A;--f:#FF9B66;--v:#58C490;--t:#A99BFF;--btn:#EAF4EE;--btnink:#0F1D19;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.45 Nunito,system-ui,sans-serif;padding-bottom:84px}
+h1,h2,h3{font-family:'Bricolage Grotesque',Nunito,sans-serif;margin:0}
+main{max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:28px;font-weight:800}
+.sub{color:var(--mute);margin:2px 0 14px}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--t);outline-offset:2px}
+.kids{display:flex;gap:8px;margin-bottom:12px}
+.kid{flex:1;padding:12px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-weight:700}
+.kid.on{background:var(--btn);color:var(--btnink);border-color:var(--btn)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.btn{padding:10px 14px;border-radius:12px;border:2px solid var(--ink);background:transparent;font-weight:700}
+.btn.fill{background:var(--btn);color:var(--btnink);border-color:var(--btn)}
+.day{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px}
+.dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.dots{display:flex;gap:4px}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--line)}
+.slot{display:flex;align-items:center;width:100%;text-align:left;gap:10px;padding:9px 10px;margin-top:6px;border-radius:12px;border:2px dashed var(--line);background:transparent;min-height:46px}
+.slot.has{border-style:solid;border-color:transparent;background:color-mix(in srgb,var(--c) 16%,transparent)}
+.slot b{width:8px;align-self:stretch;border-radius:4px;background:var(--c);flex:none}
+.slot small{display:block;color:var(--mute);font-size:12px;font-weight:700}
+.slot .n{flex:1;font-weight:700}
+.slot.empty .n{color:var(--mute);font-weight:500}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-end}
+.panel{background:var(--bg);width:100%;max-width:640px;margin:0 auto;border-radius:22px 22px 0 0;max-height:82%;overflow:auto;padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.opt{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px;margin-bottom:6px;border-radius:12px;border:1px solid var(--line);background:var(--card);text-align:left}
+.opt.no{opacity:.45}
+.tag{font-size:12px;font-weight:700;color:var(--t)}
+.add{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}
+.add input,.add select{flex:1;min-width:120px;padding:10px;border-radius:10px;border:2px solid var(--line);background:var(--card)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+nav button{flex:1;padding:12px 4px;border:0;background:none;font-weight:700;color:var(--mute)}
+nav button.on{color:var(--ink);box-shadow:inset 0 3px 0 var(--v)}
+.tip{background:color-mix(in srgb,var(--t) 14%,transparent);border-radius:14px;padding:12px;margin-bottom:14px}
+.sec{margin:16px 0 6px;font-size:18px}
+.item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:6px;width:100%;text-align:left}
+.item.done{opacity:.5;text-decoration:line-through}
+.chk{width:22px;height:22px;border-radius:6px;border:2px solid var(--mute);flex:none;display:grid;place-items:center;font-size:14px}
+.done .chk{background:var(--v);border-color:var(--v);color:#fff}
+.chips{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;padding-bottom:4px}
+.chip{padding:6px 12px;border-radius:99px;border:2px solid var(--line);background:var(--card);white-space:nowrap;font-weight:700}
+.chip.on{background:var(--btn);color:var(--btnink);border-color:var(--btn)}
+.empty-note{color:var(--mute);text-align:center;padding:24px 8px}
+.names input{width:100%;padding:10px;border-radius:10px;border:2px solid var(--line);background:var(--card);margin-bottom:8px}
+.fine{color:var(--mute);font-size:13px}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav id="nav"></nav>
+<script>
+var RAW="p|d|String cheese|0;p|d|Cheese cubes|0;p|d|Turkey roll-ups|0;p|d|Ham & cheese roll-ups|0;p|d|Hard-boiled egg|0;p|d|Greek yogurt tube|0;p|d|Turkey & cheese sandwich|0;p|d|Ham & cheese sandwich|0;p|b|Hummus cup|0;p|d|Pepperoni slices|0;p|d|Cream cheese bagel|0;p|d|Cottage cheese cup|1;p|r|Edamame|1;p|d|Tuna salad & crackers|1;p|d|Chicken salad bites|1;p|d|Cold mini meatballs|1;p|b|Roasted chickpeas|1;p|d|Bean & cheese cold quesadilla|1;g|b|Crackers|0;g|b|Pita triangles|0;g|b|Mini bagel|0;g|b|Tortilla pinwheels|0;g|b|Pretzels|0;g|b|Cold pasta salad|0;g|b|Rice cakes|0;g|b|Popcorn|0;g|b|Whole-grain waffle|0;g|b|Banana bread|0;g|b|Nut-free granola bar|0;g|b|Veggie mini muffin|1;g|b|Seeded crackers|1;f|r|Apple slices|0;f|r|Grapes|0;f|r|Strawberries|0;f|r|Blueberries|0;f|r|Clementine|0;f|r|Banana|0;f|r|Melon cubes|0;f|r|Pineapple chunks|0;f|r|Pear slices|0;f|b|Applesauce pouch|0;f|r|Kiwi|1;f|r|Mango|1;f|r|Raspberries|1;f|r|Peach slices|1;v|r|Cucumber slices|0;v|r|Baby carrots|0;v|r|Cherry tomatoes|0;v|r|Snap peas|0;v|r|Celery sticks|0;v|r|Corn kernels|0;v|r|Bell pepper strips|1;v|r|Broccoli with ranch|1;v|r|Avocado slices|1;v|r|Mini sweet peppers|1;v|r|Cauliflower bites|1;v|r|Jicama sticks|1;p|d|Cream cheese & jelly sandwich|0;p|d|Turkey & cheese mini bagel|0;p|d|Cheese sandwich on soft bread|0;p|d|Pizza roll-up (cheese, pepperoni, sauce)|0;p|d|Cold cheese quesadilla|0;p|d|Turkey & cheese pita pocket|0;p|d|Cream cheese & cucumber sandwich|1;p|d|Egg salad sandwich|1;p|d|Chicken salad sandwich|1;p|d|Turkey, cheese & lettuce wrap|1;p|b|Hummus & veggie pita pocket|1;p|r|Avocado & cheese sandwich|1;p|d|Turkey & apple sandwich|1;p|d|Build-your-own cracker stack kit|0;p|d|Veggie pizza roll-up (cheese & sauce)|0;p|d|Cheese & tomato sandwich|0;p|d|Greek yogurt cup with granola|0;p|d|Veggie cream cheese pinwheels|0;p|d|Mozzarella & tomato skewers|1;p|b|Chickpea salad sandwich|1;p|d|Baked tofu cubes|1;p|b|Falafel bites|1;p|b|Black bean & corn salad|1";
+var BASE=RAW.split(";").map(function(l,i){var a=l.split("|");return{id:"f"+i,s:a[0],a:a[1],n:a[2],x:a[3]==="1"}});
+var D=["Mon","Tue","Wed","Thu","Fri"],SL=[["p","Protein"],["g","Grain"],["f","Fruit"],["v","Veggie"],["t","Tiny try"]];
+var CLR={p:"var(--p)",g:"var(--g)",f:"var(--f)",v:"var(--v)",t:"var(--t)"};
+var AIS={r:"Produce",d:"Dairy & deli",b:"Pantry & bakery"};
+var RI={l:"❤️",o:"🙂",n:"🚫"},RN={l:"loves it",o:"okay",n:"no thanks"};
+var TIPS=["Put the tiny try next to a food they already love. One bite counts as a win.","Kids often need 10–15 calm exposures before accepting a new food. No pressure, no bribes.","Dips help: ranch, hummus, or yogurt make new veggies and fruit friendlier.","Let them pick one slot each week. A say in the plan means more eaten.","Cut the same food a new way: sticks, coins, or cookie-cutter shapes.","Cold pasta salad, pinwheels and roll-ups taste better cold than reheated leftovers."];
+var S={kids:["ADELINE","REILLY"],veg:{0:true},k:0,plan:{0:{},1:{}},rate:{0:{},1:{}},custom:[],checks:{},extra:[],tab:"plan",pick:null,filt:"all"};
+var KEY="lunchbox-v1";
+try{var sv=localStorage.getItem(KEY);if(sv){var o=JSON.parse(sv);for(var q in o)S[q]=o[q];S.pick=null}}catch(e){}
+if(S.kids[0]==="Kid 1"||S.kids[0]==="Adeline")S.kids[0]="ADELINE";if(S.kids[1]==="Kid 2")S.kids[1]="REILLY";if(!S.veg)S.veg={0:true};
+var MEAT=/turkey|\bham\b|pepperoni|tuna|chicken|meatball/i;
+function ok(f,k){return !(S.veg[k===undefined?S.k:k]&&MEAT.test(f.n))}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function foods(){return BASE.concat(S.custom)}
+function fd(id){return foods().filter(function(f){return f.id===id})[0]}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function R(id,k){return S.rate[k===undefined?S.k:k][id]}
+function rnd(a){return a[Math.floor(Math.random()*a.length)]}
+
+function render(){
+var h="";
+if(S.tab==="plan")h=planV();else if(S.tab==="try")h=tryV();else h=shopV();
+document.getElementById("app").innerHTML=h+(S.pick?sheetV():"");
+document.getElementById("nav").innerHTML=[["plan","Plan"],["try","Foods"],["shop","Shop"]].map(function(t){return'<button class="'+(S.tab===t[0]?"on":"")+'" data-a="tab" data-v="'+t[0]+'">'+t[1]+"</button>"}).join("");
+}
+function kidsV(){return'<div class="kids">'+S.kids.map(function(n,i){return'<button class="kid '+(S.k===i?"on":"")+'" data-a="kid" data-v="'+i+'">'+esc(n)+"</button>"}).join("")+"</div>"}
+function planV(){
+var pl=S.plan[S.k],h="<h1>This week’s lunches</h1><p class='sub'>No heating, no peanuts. Tap a slot to choose.</p>"+kidsV();
+h+='<div class="row"><button class="btn fill" data-a="fill">Fill empty slots</button><button class="btn" data-a="copy">Copy to '+esc(S.kids[1-S.k])+'</button><button class="btn" data-a="clear">Clear week</button><button class="btn" data-a="veg">Vegetarian: '+(S.veg[S.k]?"on":"off")+'</button></div>';
+D.forEach(function(d,di){
+var dots="";
+h+='<section class="day"><div class="dh"><h3>'+d+'</h3><div class="dots" title="Protein, grain, fruit, veggie">';
+SL.slice(0,4).forEach(function(s){h+='<span class="dot" style="'+(pl[di+"_"+s[0]]?"background:"+CLR[s[0]]:"")+'"></span>'});
+h+="</div></div>";
+SL.forEach(function(s){
+var id=pl[di+"_"+s[0]],f=id&&fd(id);
+h+='<button class="slot '+(f?"has":"empty")+'" style="--c:'+CLR[s[0]]+'" data-a="open" data-d="'+di+'" data-s="'+s[0]+'"><b></b><span class="n"><small>'+s[1]+"</small>"+(f?esc(f.n):"+ add")+"</span>"+(f&&R(id)?"<span>"+RI[R(id)]+"</span>":"")+"</button>";
+});
+h+="</section>";
+});
+h+='<div class="names"><h3 class="sec">Kids’ names</h3><input aria-label="First child" data-a="name" data-v="0" value="'+esc(S.kids[0])+'"><input aria-label="Second child" data-a="name" data-v="1" value="'+esc(S.kids[1])+'"></div>';
+return h;
+}
+function sheetV(){
+var p=S.pick,t=p.s==="t",lab=SL.filter(function(s){return s[0]===p.s})[0][1];
+var list=foods().filter(function(f){return ok(f)&&(t?f.x:f.s===p.s)});
+var ord={l:0,o:1,undefined:2,n:3};
+list.sort(function(a,b){return ord[R(a.id)]-ord[R(b.id)]});
+var h='<div class="sheet" data-a="close"><div class="panel" role="dialog" aria-label="Choose '+lab+'" onclick="event.stopPropagation()"><h2>'+D[p.d]+": "+lab+"</h2><p class='sub'>For "+esc(S.kids[S.k])+(t?". New or less-loved foods, one small bite.":"")+"</p>";
+list.forEach(function(f){var r=R(f.id);h+='<button class="opt '+(r==="n"?"no":"")+'" data-a="set" data-id="'+f.id+'"><span>'+esc(f.n)+"</span><span>"+(f.x&&!t?'<span class="tag">new-ish </span>':"")+(r?RI[r]:"")+"</span></button>"});
+h+='<div class="add"><input id="newf" placeholder="Add your own food"><select id="newa"><option value="r">Produce</option><option value="d">Dairy & deli</option><option value="b">Pantry & bakery</option></select><button class="btn fill" data-a="addf">Add</button></div>';
+h+='<div class="row"><button class="btn" data-a="unset">Clear slot</button><button class="btn" data-a="close">Close</button></div></div></div>';
+return h;
+}
+function tryV(){
+var f=S.filt,h="<h1>Foods</h1><p class='sub'>Rate each food for "+esc(S.kids[S.k])+". Tap to cycle: ❤️ loves, 🙂 okay, 🚫 no thanks.</p>"+kidsV();
+h+='<div class="tip">'+TIPS[new Date().getDate()%TIPS.length]+"</div>";if(S.veg[S.k])h+='<div class="tip">Vegetarian protein: eggs, cheese, yogurt, hummus, beans, tofu and edamame. Meat items are hidden.</div>';
+h+='<div class="chips">'+[["all","All"],["new","New-ish"],["un","Not rated yet"],["l","Loves"],["n","No thanks"]].map(function(c){return'<button class="chip '+(f===c[0]?"on":"")+'" data-a="filt" data-v="'+c[0]+'">'+c[1]+"</button>"}).join("")+"</div>";
+var any=false;
+SL.slice(0,4).forEach(function(s){
+var l=foods().filter(function(x){if(x.s!==s[0]||!ok(x))return false;var r=R(x.id);return f==="all"||(f==="new"&&x.x)||(f==="un"&&!r)||(f===r)});
+if(!l.length)return;any=true;
+h+='<h3 class="sec" style="color:'+CLR[s[0]]+'">'+s[1]+"</h3>";
+l.forEach(function(x){var r=R(x.id);h+='<button class="item" data-a="rate" data-id="'+x.id+'"><span style="flex:1">'+esc(x.n)+(x.x?' <span class="tag">new-ish</span>':"")+"</span><span>"+(r?RI[r]+' <span class="fine">'+RN[r]+"</span>":'<span class="fine">not rated</span>')+"</span></button>"});
+});
+if(!any)h+='<p class="empty-note">Nothing here yet.</p>';
+h+='<p class="fine">Peanut-free ideas, nothing needs heating. Always check labels against your school’s allergy rules.</p>';
+return h;
+}
+function shopV(){
+var c={};
+[0,1].forEach(function(k){for(var key in S.plan[k]){var id=S.plan[k][key];c[id]=(c[id]||0)+1}});
+var by={r:[],d:[],b:[]};
+Object.keys(c).forEach(function(id){var f=fd(id);if(f)by[f.a].push({id:id,n:f.n,q:c[id]})});
+var h="<h1>Shopping list</h1><p class='sub'>Built from both kids’ plans. Check items off as you shop.</p>",tot=0;
+["r","d","b"].forEach(function(a){
+if(!by[a].length)return;tot+=by[a].length;
+h+='<h3 class="sec">'+AIS[a]+"</h3>";
+by[a].sort(function(x,y){return x.n<y.n?-1:1}).forEach(function(i){h+=item(i.id,i.n+(i.q>1?" ×"+i.q:""))});
+});
+h+='<h3 class="sec">Extras</h3>';
+S.extra.forEach(function(e,i){h+=item("e"+i,e)});
+h+='<div class="add"><input id="newx" placeholder="Add anything else"><button class="btn fill" data-a="addx">Add</button></div>';
+if(!tot&&!S.extra.length)h+='<p class="empty-note">Plan some lunches and your list shows up here.</p>';
+h+='<div class="row"><button class="btn" data-a="uncheck">Uncheck all</button><button class="btn" data-a="clrx">Remove extras</button></div>';
+return h;
+}
+function item(id,n){var d=S.checks[id];return'<button class="item '+(d?"done":"")+'" data-a="chk" data-id="'+id+'"><span class="chk">'+(d?"✓":"")+"</span><span>"+esc(n)+"</span></button>"}
+
+function fill(){
+var pl=S.plan[S.k],used={};
+for(var key in pl)used[pl[key]]=1;
+var tries=0;
+D.forEach(function(d,di){
+SL.forEach(function(s){
+var k=di+"_"+s[0];if(pl[k])return;
+if(s[0]==="t"){if(di!==1&&di!==3)return}
+var l=foods().filter(function(f){return ok(f)&&(s[0]==="t"?f.x:f.s===s[0])&&R(f.id)!=="n"});
+if(s[0]!=="t")l=l.filter(function(f){return !f.x||Math.random()<.25});
+var fresh=l.filter(function(f){return !used[f.id]});
+if(s[0]==="t"){var un=fresh.filter(function(f){return !R(f.id)});if(un.length)fresh=un}
+var pool=fresh.length?fresh:l;if(!pool.length)return;
+var pick=rnd(pool);pl[k]=pick.id;used[pick.id]=1;
+});
+});
+}
+document.addEventListener("click",function(e){
+var el=e.target.closest("[data-a]");if(!el)return;
+var a=el.dataset.a,v=el.dataset.v,pl=S.plan[S.k];
+if(a==="tab"){S.tab=v}
+else if(a==="kid"){S.k=+v}
+else if(a==="fill"){fill()}
+else if(a==="copy"){var tk=1-S.k,np={};for(var kk in pl){var ff=fd(pl[kk]);if(ff&&ok(ff,tk))np[kk]=pl[kk]}S.plan[tk]=np}
+else if(a==="veg"){if(S.veg[S.k]){delete S.veg[S.k]}else{S.veg[S.k]=true;for(var kv in pl){var fv=fd(pl[kv]);if(fv&&!ok(fv))delete pl[kv]}}}
+else if(a==="clear"){if(!confirm("Clear this week for "+S.kids[S.k]+"?"))return;S.plan[S.k]={}}
+else if(a==="open"){S.pick={d:+el.dataset.d,s:el.dataset.s}}
+else if(a==="close"){S.pick=null}
+else if(a==="set"){pl[S.pick.d+"_"+S.pick.s]=el.dataset.id;S.pick=null}
+else if(a==="unset"){delete pl[S.pick.d+"_"+S.pick.s];S.pick=null}
+else if(a==="addf"){
+var n=document.getElementById("newf").value.trim();if(!n)return;
+var id="c"+Date.now(),t=S.pick.s==="t";
+S.custom.push({id:id,s:t?"v":S.pick.s,a:document.getElementById("newa").value,n:n,x:t});
+pl[S.pick.d+"_"+S.pick.s]=id;S.pick=null}
+else if(a==="rate"){var id2=el.dataset.id,r=S.rate[S.k],nx={undefined:"l",l:"o",o:"n",n:undefined}[r[id2]];if(nx)r[id2]=nx;else delete r[id2]}
+else if(a==="filt"){S.filt=v}
+else if(a==="chk"){var i=el.dataset.id;if(S.checks[i])delete S.checks[i];else S.checks[i]=1}
+else if(a==="addx"){var x=document.getElementById("newx").value.trim();if(!x)return;S.extra.push(x)}
+else if(a==="uncheck"){S.checks={}}
+else if(a==="clrx"){S.extra=[];for(var c in S.checks)if(c[0]==="e")delete S.checks[c]}
+save();render();
+});
+document.addEventListener("input",function(e){
+var el=e.target;if(el.dataset&&el.dataset.a==="name"){S.kids[+el.dataset.v]=el.value||"Kid "+(+el.dataset.v+1);save();var b=document.querySelectorAll(".kid");if(b[+el.dataset.v])b[+el.dataset.v].textContent=S.kids[+el.dataset.v]}
+});
+render();
+</script>
+</body>
+</html>
